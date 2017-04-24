@@ -228,7 +228,16 @@ public class DraggableRelativeLayout extends RelativeLayout implements ToolbarAn
                     } else {
                         coverViewListener.viewScrolling();
                     }
-                    animateMenuView(FLING_ANIMATION_DURATION);
+                    if (!isMenuOpened() && valueY == appbarView.getBottom()) {
+                        Log.d(TAG, "animate menu back to bot");
+                        animateMenuView(FLING_ANIMATION_DURATION, true);
+                    } else if (isMenuOpened() && valueY == BOTTOM_Y_THRESHOLD) {
+                        Log.d(TAG, "animate menu back to top");
+                        animateMenuView(FLING_ANIMATION_DURATION, false);
+                    } else {
+                        animateMenuView(FLING_ANIMATION_DURATION);
+                    }
+
                 }
             }
 
@@ -305,6 +314,13 @@ public class DraggableRelativeLayout extends RelativeLayout implements ToolbarAn
     private void animateMenuView(long duration) {
         AnimatorSet set = new AnimatorSet();
         set.playTogether(getMenuAlphaAnimation(isMenuOpened()), getMenuYAnimation(isMenuOpened()));
+        set.setDuration(duration);
+        set.start();
+    }
+
+    private void animateMenuView(long duration, boolean opened) {
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(getMenuAlphaAnimation(opened), getMenuYAnimation(opened));
         set.setDuration(duration);
         set.start();
     }
